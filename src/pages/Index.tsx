@@ -597,91 +597,330 @@ const Minesweeper = () => {
 
 const YouTubeApp = ({ onClose }: { onClose: () => void }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<any | null>(null);
+  const [activeTab, setActiveTab] = useState<'home' | 'trending' | 'subscriptions' | 'library'>('home');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [likes, setLikes] = useState<Set<string>>(new Set());
+  const [subscribed, setSubscribed] = useState<Set<string>>(new Set());
 
-  const videos = [
-    { id: '1', title: 'Обзор Windows 12', channel: 'Tech Channel', views: '1.2M', thumbnail: '🎬' },
-    { id: '2', title: 'Топ игр 2026 года', channel: 'Gaming Pro', views: '850K', thumbnail: '🎮' },
-    { id: '3', title: 'Уроки программирования', channel: 'Code Academy', views: '2.1M', thumbnail: '💻' },
-    { id: '4', title: 'Музыка для работы', channel: 'Chill Beats', views: '5.3M', thumbnail: '🎵' },
-    { id: '5', title: 'Как создать сайт', channel: 'Web Dev', views: '620K', thumbnail: '🌐' },
-    { id: '6', title: 'Minecraft строительство', channel: 'Craft Master', views: '3.8M', thumbnail: '⛏️' },
+  const channels = [
+    { id: '1', name: 'TechMaster', avatar: '👨‍💻', subscribers: '2.5M', verified: true },
+    { id: '2', name: 'GameZone', avatar: '🎮', subscribers: '1.8M', verified: true },
+    { id: '3', name: 'MusicVibes', avatar: '🎵', subscribers: '5.2M', verified: true },
+    { id: '4', name: 'CookingPro', avatar: '👨‍🍳', subscribers: '980K', verified: false },
+    { id: '5', name: 'FitnessGuru', avatar: '💪', subscribers: '1.2M', verified: true },
+    { id: '6', name: 'ArtStudio', avatar: '🎨', subscribers: '750K', verified: false },
   ];
 
-  const filteredVideos = videos.filter(v => 
-    v.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    v.channel.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const videos = [
+    { id: '1', title: 'Обзор Windows 12 - Революция в мире ОС!', channelId: '1', views: '1.2M', likes: '45K', duration: '12:34', uploaded: '2 дня назад', category: 'tech', isLive: false },
+    { id: '2', title: 'ТОП 10 ИГР 2026 ГОДА', channelId: '2', views: '2.8M', likes: '89K', duration: '18:42', uploaded: '5 дней назад', category: 'gaming', isLive: false },
+    { id: '3', title: '🔴 ПРЯМОЙ ЭФИР: Программирование на React', channelId: '1', views: '12K', likes: '1.2K', duration: 'LIVE', uploaded: 'В эфире', category: 'tech', isLive: true },
+    { id: '4', title: 'Лучшая музыка для работы | 3 часа', channelId: '3', views: '5.3M', likes: '156K', duration: '3:00:00', uploaded: '1 месяц назад', category: 'music', isLive: false },
+    { id: '5', title: 'Как создать сайт за 10 минут', channelId: '1', views: '620K', likes: '28K', duration: '10:15', uploaded: '1 неделю назад', category: 'tech', isLive: false },
+    { id: '6', title: 'Minecraft: Строим ОГРОМНЫЙ замок!', channelId: '2', views: '3.8M', likes: '125K', duration: '25:18', uploaded: '3 дня назад', category: 'gaming', isLive: false },
+    { id: '7', title: 'Рецепт идеальной пасты Карбонара', channelId: '4', views: '450K', likes: '18K', duration: '8:22', uploaded: '2 недели назад', category: 'cooking', isLive: false },
+    { id: '8', title: '🔴 LIVE: Тренировка дома без оборудования', channelId: '5', views: '8.5K', likes: '890', duration: 'LIVE', uploaded: 'В эфире', category: 'fitness', isLive: true },
+    { id: '9', title: 'Рисуем портрет маслом - урок для начинающих', channelId: '6', views: '280K', likes: '12K', duration: '32:45', uploaded: '5 дней назад', category: 'art', isLive: false },
+    { id: '10', title: 'Обзор нейросети ChatGPT 5.0', channelId: '1', views: '1.5M', likes: '62K', duration: '15:30', uploaded: '1 день назад', category: 'tech', isLive: false },
+  ];
+
+  const getChannel = (channelId: string) => channels.find(c => c.id === channelId);
+  
+  const getVideosByTab = () => {
+    if (activeTab === 'trending') return videos.filter(v => parseInt(v.views) > 1000000);
+    if (activeTab === 'subscriptions') return videos.filter(v => subscribed.has(v.channelId));
+    if (activeTab === 'library') return videos.filter(v => likes.has(v.id));
+    return videos;
+  };
+
+  const filteredVideos = getVideosByTab().filter(v => {
+    const channel = getChannel(v.channelId);
+    return v.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+           channel?.name.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
+  const toggleLike = (videoId: string) => {
+    setLikes(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(videoId)) {
+        newSet.delete(videoId);
+      } else {
+        newSet.add(videoId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSubscribe = (channelId: string) => {
+    setSubscribed(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(channelId)) {
+        newSet.delete(channelId);
+      } else {
+        newSet.add(channelId);
+      }
+      return newSet;
+    });
+  };
 
   return (
     <Card className="flex-1 glass border-white/10 overflow-hidden flex flex-col">
-      <div className="bg-red-600 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Icon name="Youtube" className="text-white" size={32} />
-          <h2 className="text-2xl font-bold text-white">YouTube</h2>
+      <div className="bg-[#0f0f0f] border-b border-white/10 px-4 py-2 flex items-center justify-between">
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <Icon name="Youtube" className="text-red-600" size={32} />
+            <h2 className="text-xl font-bold text-white">YouTube</h2>
+          </div>
+          
+          <div className="relative flex-1 max-w-2xl">
+            <Input
+              placeholder="Поиск"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-4 pr-12 bg-[#121212] border-white/20 text-white placeholder:text-white/50 h-10"
+            />
+            <Button size="icon" variant="ghost" className="absolute right-0 top-0 text-white hover:bg-white/10">
+              <Icon name="Search" size={20} />
+            </Button>
+          </div>
         </div>
-        <Button variant="ghost" onClick={onClose} className="text-white hover:bg-white/10">
-          <Icon name="X" size={20} />
-        </Button>
+
+        <div className="flex items-center gap-2">
+          <Button size="icon" variant="ghost" className="text-white hover:bg-white/10">
+            <Icon name="Video" size={20} />
+          </Button>
+          <Button size="icon" variant="ghost" className="text-white hover:bg-white/10">
+            <Icon name="Bell" size={20} />
+          </Button>
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold cursor-pointer">
+            U
+          </div>
+          <Button size="icon" variant="ghost" onClick={onClose} className="text-white hover:bg-white/10">
+            <Icon name="X" size={20} />
+          </Button>
+        </div>
       </div>
 
-      <div className="p-6">
-        <div className="relative mb-6">
-          <Icon name="Search" className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" size={20} />
-          <Input
-            placeholder="Поиск видео..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 glass border-white/20 text-white placeholder:text-white/50 h-12"
-          />
-        </div>
-
-        {selectedVideo ? (
-          <div className="space-y-4">
-            <Button 
-              variant="outline" 
-              className="glass border-white/20 text-white hover:bg-white/10"
-              onClick={() => setSelectedVideo(null)}
+      <div className="flex-1 flex overflow-hidden">
+        <div className="bg-[#0f0f0f] w-56 border-r border-white/10 overflow-y-auto py-3">
+          {[
+            { id: 'home' as const, icon: 'Home', label: 'Главная' },
+            { id: 'trending' as const, icon: 'TrendingUp', label: 'В тренде' },
+            { id: 'subscriptions' as const, icon: 'Users', label: 'Подписки' },
+            { id: 'library' as const, icon: 'Library', label: 'Библиотека' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`w-full flex items-center gap-4 px-4 py-2.5 transition-colors ${
+                activeTab === tab.id ? 'bg-white/10' : 'hover:bg-white/5'
+              }`}
             >
-              <Icon name="ArrowLeft" size={16} className="mr-2" />
-              Назад к видео
-            </Button>
-            <Card className="glass border-white/10 p-8">
-              <div className="aspect-video bg-gradient-to-br from-red-600 to-pink-600 rounded-xl flex items-center justify-center mb-4">
-                <div className="text-center space-y-4">
-                  <div className="text-8xl">{videos.find(v => v.id === selectedVideo)?.thumbnail}</div>
-                  <Button size="lg" className="bg-white text-red-600 hover:bg-white/90">
-                    <Icon name="Play" size={32} className="mr-2" />
-                    Воспроизвести
-                  </Button>
+              <Icon name={tab.icon} size={20} className="text-white" />
+              <span className="text-white text-sm">{tab.label}</span>
+            </button>
+          ))}
+
+          <div className="border-t border-white/10 mt-3 pt-3 px-4">
+            <p className="text-white/70 text-xs font-semibold mb-2">ПОДПИСКИ</p>
+            {channels.filter(c => subscribed.has(c.id)).map((channel) => (
+              <button key={channel.id} className="w-full flex items-center gap-3 py-2 hover:bg-white/5 rounded">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-sm">
+                  {channel.avatar}
                 </div>
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">
-                {videos.find(v => v.id === selectedVideo)?.title}
-              </h3>
-              <p className="text-white/70">
-                {videos.find(v => v.id === selectedVideo)?.channel} • {videos.find(v => v.id === selectedVideo)?.views} просмотров
-              </p>
-            </Card>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredVideos.map((video) => (
-              <Card 
-                key={video.id} 
-                className="glass border-white/10 p-4 hover:scale-105 transition-all cursor-pointer hover:border-red-500/50"
-                onClick={() => setSelectedVideo(video.id)}
-              >
-                <div className="aspect-video bg-gradient-to-br from-red-600 to-pink-600 rounded-xl flex items-center justify-center mb-3 text-6xl">
-                  {video.thumbnail}
-                </div>
-                <h4 className="text-white font-semibold mb-1 line-clamp-2">{video.title}</h4>
-                <p className="text-sm text-white/70">{video.channel}</p>
-                <p className="text-xs text-white/50">{video.views} просмотров</p>
-              </Card>
+                <span className="text-white text-sm flex-1 text-left truncate">{channel.name}</span>
+              </button>
             ))}
           </div>
-        )}
+        </div>
+
+        <div className="flex-1 bg-[#0f0f0f] overflow-y-auto">
+          {selectedVideo ? (
+            <div className="p-6 space-y-4">
+              <div className="max-w-6xl mx-auto">
+                <div className="aspect-video bg-black rounded-xl overflow-hidden mb-4 relative group">
+                  {isPlaying ? (
+                    <div className="w-full h-full bg-gradient-to-br from-purple-900 via-blue-900 to-pink-900 flex items-center justify-center relative">
+                      <div className="absolute inset-0 bg-black/40"></div>
+                      <div className="relative z-10 text-center space-y-4">
+                        <div className="text-8xl animate-pulse">▶️</div>
+                        <p className="text-white text-2xl font-semibold">{selectedVideo.title}</p>
+                        <div className="flex items-center gap-2 justify-center text-white/70">
+                          <div className="w-64 h-1 bg-white/20 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-red-600 transition-all duration-1000"
+                              style={{ width: `${(currentTime / 100) * 100}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-sm">{Math.floor(currentTime)}:00 / {selectedVideo.duration}</span>
+                        </div>
+                      </div>
+                      <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="text-white hover:bg-white/20"
+                          onClick={() => setIsPlaying(false)}
+                        >
+                          <Icon name="Pause" size={24} />
+                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button size="icon" variant="ghost" className="text-white hover:bg-white/20">
+                            <Icon name="Volume2" size={20} />
+                          </Button>
+                          <Button size="icon" variant="ghost" className="text-white hover:bg-white/20">
+                            <Icon name="Settings" size={20} />
+                          </Button>
+                          <Button size="icon" variant="ghost" className="text-white hover:bg-white/20">
+                            <Icon name="Maximize" size={20} />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-red-900 via-purple-900 to-blue-900 flex items-center justify-center cursor-pointer"
+                         onClick={() => {
+                           setIsPlaying(true);
+                           const interval = setInterval(() => {
+                             setCurrentTime(prev => {
+                               if (prev >= 100) {
+                                 clearInterval(interval);
+                                 setIsPlaying(false);
+                                 return 0;
+                               }
+                               return prev + 1;
+                             });
+                           }, 1000);
+                         }}
+                    >
+                      <div className="text-center space-y-4">
+                        <Button size="lg" className="w-20 h-20 rounded-full bg-red-600 hover:bg-red-700">
+                          <Icon name="Play" size={40} />
+                        </Button>
+                        {selectedVideo.isLive && (
+                          <Badge className="bg-red-600 text-white px-3 py-1">
+                            🔴 В ЭФИРЕ
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <h1 className="text-white text-xl font-semibold mb-4">{selectedVideo.title}</h1>
+
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xl">
+                        {getChannel(selectedVideo.channelId)?.avatar}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-white font-semibold">{getChannel(selectedVideo.channelId)?.name}</span>
+                          {getChannel(selectedVideo.channelId)?.verified && (
+                            <Icon name="BadgeCheck" size={16} className="text-white" />
+                          )}
+                        </div>
+                        <span className="text-white/70 text-sm">{getChannel(selectedVideo.channelId)?.subscribers} подписчиков</span>
+                      </div>
+                    </div>
+                    <Button 
+                      className={subscribed.has(selectedVideo.channelId) ? 'bg-white/10 hover:bg-white/20' : 'bg-white hover:bg-white/90 text-black'}
+                      onClick={() => toggleSubscribe(selectedVideo.channelId)}
+                    >
+                      {subscribed.has(selectedVideo.channelId) ? 'Вы подписаны' : 'Подписаться'}
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="glass border-white/20 text-white hover:bg-white/10"
+                      onClick={() => toggleLike(selectedVideo.id)}
+                    >
+                      <Icon name={likes.has(selectedVideo.id) ? 'ThumbsUp' : 'ThumbsUp'} size={20} className={likes.has(selectedVideo.id) ? 'fill-current' : ''} />
+                      <span className="ml-2">{selectedVideo.likes}</span>
+                    </Button>
+                    <Button variant="outline" className="glass border-white/20 text-white hover:bg-white/10">
+                      <Icon name="Share2" size={20} />
+                      <span className="ml-2">Поделиться</span>
+                    </Button>
+                  </div>
+                </div>
+
+                <Card className="glass border-white/10 p-4 mb-4">
+                  <p className="text-white/70 text-sm">
+                    {selectedVideo.views} просмотров • {selectedVideo.uploaded}
+                  </p>
+                  <p className="text-white/90 mt-2">
+                    Описание видео появится здесь. Подпишитесь на канал чтобы не пропустить новые выпуски!
+                  </p>
+                </Card>
+
+                <Button 
+                  variant="outline" 
+                  className="glass border-white/20 text-white hover:bg-white/10"
+                  onClick={() => setSelectedVideo(null)}
+                >
+                  <Icon name="ArrowLeft" size={16} className="mr-2" />
+                  Назад к видео
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="p-6">
+              {activeTab === 'home' && (
+                <div className="mb-6 bg-gradient-to-r from-red-600 to-pink-600 rounded-xl p-6 text-white">
+                  <h2 className="text-2xl font-bold mb-2">Добро пожаловать в YouTube!</h2>
+                  <p className="text-white/90">Смотрите видео от любимых блогеров, подписывайтесь на каналы и наслаждайтесь контентом</p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filteredVideos.map((video) => {
+                  const channel = getChannel(video.channelId);
+                  return (
+                    <Card 
+                      key={video.id} 
+                      className="glass border-white/10 p-0 hover:scale-105 transition-all cursor-pointer overflow-hidden"
+                      onClick={() => setSelectedVideo(video)}
+                    >
+                      <div className="aspect-video bg-gradient-to-br from-red-600 to-purple-600 flex items-center justify-center relative">
+                        <Icon name="Play" size={48} className="text-white opacity-80" />
+                        <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-0.5 rounded text-white text-xs font-semibold">
+                          {video.duration}
+                        </div>
+                        {video.isLive && (
+                          <div className="absolute top-2 left-2 bg-red-600 px-2 py-0.5 rounded text-white text-xs font-semibold">
+                            🔴 LIVE
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-3">
+                        <div className="flex gap-3">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                            {channel?.avatar}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-white font-semibold text-sm line-clamp-2 mb-1">{video.title}</h4>
+                            <div className="flex items-center gap-1 mb-0.5">
+                              <p className="text-white/70 text-xs">{channel?.name}</p>
+                              {channel?.verified && <Icon name="BadgeCheck" size={12} className="text-white/70" />}
+                            </div>
+                            <p className="text-white/50 text-xs">{video.views} • {video.uploaded}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </Card>
   );
