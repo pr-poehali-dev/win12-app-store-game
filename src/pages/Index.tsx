@@ -614,16 +614,16 @@ const YouTubeApp = ({ onClose }: { onClose: () => void }) => {
   ];
 
   const videos = [
-    { id: '1', title: 'Обзор Windows 12 - Революция в мире ОС!', channelId: '1', views: '1.2M', likes: '45K', duration: '12:34', uploaded: '2 дня назад', category: 'tech', isLive: false },
-    { id: '2', title: 'ТОП 10 ИГР 2026 ГОДА', channelId: '2', views: '2.8M', likes: '89K', duration: '18:42', uploaded: '5 дней назад', category: 'gaming', isLive: false },
-    { id: '3', title: '🔴 ПРЯМОЙ ЭФИР: Программирование на React', channelId: '1', views: '12K', likes: '1.2K', duration: 'LIVE', uploaded: 'В эфире', category: 'tech', isLive: true },
-    { id: '4', title: 'Лучшая музыка для работы | 3 часа', channelId: '3', views: '5.3M', likes: '156K', duration: '3:00:00', uploaded: '1 месяц назад', category: 'music', isLive: false },
-    { id: '5', title: 'Как создать сайт за 10 минут', channelId: '1', views: '620K', likes: '28K', duration: '10:15', uploaded: '1 неделю назад', category: 'tech', isLive: false },
-    { id: '6', title: 'Minecraft: Строим ОГРОМНЫЙ замок!', channelId: '2', views: '3.8M', likes: '125K', duration: '25:18', uploaded: '3 дня назад', category: 'gaming', isLive: false },
-    { id: '7', title: 'Рецепт идеальной пасты Карбонара', channelId: '4', views: '450K', likes: '18K', duration: '8:22', uploaded: '2 недели назад', category: 'cooking', isLive: false },
-    { id: '8', title: '🔴 LIVE: Тренировка дома без оборудования', channelId: '5', views: '8.5K', likes: '890', duration: 'LIVE', uploaded: 'В эфире', category: 'fitness', isLive: true },
-    { id: '9', title: 'Рисуем портрет маслом - урок для начинающих', channelId: '6', views: '280K', likes: '12K', duration: '32:45', uploaded: '5 дней назад', category: 'art', isLive: false },
-    { id: '10', title: 'Обзор нейросети ChatGPT 5.0', channelId: '1', views: '1.5M', likes: '62K', duration: '15:30', uploaded: '1 день назад', category: 'tech', isLive: false },
+    { id: '1', title: 'Обзор Windows 12 - Революция в мире ОС!', channelId: '1', views: '1.2M', likes: '45K', duration: '12:34', uploaded: '2 дня назад', category: 'tech', isLive: false, thumbnailType: 'tech' },
+    { id: '2', title: 'ТОП 10 ИГР 2026 ГОДА', channelId: '2', views: '2.8M', likes: '89K', duration: '18:42', uploaded: '5 дней назад', category: 'gaming', isLive: false, thumbnailType: 'gaming' },
+    { id: '3', title: '🔴 ПРЯМОЙ ЭФИР: Программирование на React', channelId: '1', views: '12K', likes: '1.2K', duration: 'LIVE', uploaded: 'В эфире', category: 'tech', isLive: true, thumbnailType: 'coding' },
+    { id: '4', title: 'Лучшая музыка для работы | 3 часа', channelId: '3', views: '5.3M', likes: '156K', duration: '3:00:00', uploaded: '1 месяц назад', category: 'music', isLive: false, thumbnailType: 'music' },
+    { id: '5', title: 'Как создать сайт за 10 минут', channelId: '1', views: '620K', likes: '28K', duration: '10:15', uploaded: '1 неделю назад', category: 'tech', isLive: false, thumbnailType: 'web' },
+    { id: '6', title: 'Minecraft: Строим ОГРОМНЫЙ замок!', channelId: '2', views: '3.8M', likes: '125K', duration: '25:18', uploaded: '3 дня назад', category: 'gaming', isLive: false, thumbnailType: 'minecraft' },
+    { id: '7', title: 'Рецепт идеальной пасты Карбонара', channelId: '4', views: '450K', likes: '18K', duration: '8:22', uploaded: '2 недели назад', category: 'cooking', isLive: false, thumbnailType: 'cooking' },
+    { id: '8', title: '🔴 LIVE: Тренировка дома без оборудования', channelId: '5', views: '8.5K', likes: '890', duration: 'LIVE', uploaded: 'В эфире', category: 'fitness', isLive: true, thumbnailType: 'fitness' },
+    { id: '9', title: 'Рисуем портрет маслом - урок для начинающих', channelId: '6', views: '280K', likes: '12K', duration: '32:45', uploaded: '5 дней назад', category: 'art', isLive: false, thumbnailType: 'art' },
+    { id: '10', title: 'Обзор нейросети ChatGPT 5.0', channelId: '1', views: '1.5M', likes: '62K', duration: '15:30', uploaded: '1 день назад', category: 'tech', isLive: false, thumbnailType: 'ai' },
   ];
 
   const getChannel = (channelId: string) => channels.find(c => c.id === channelId);
@@ -663,6 +663,182 @@ const YouTubeApp = ({ onClose }: { onClose: () => void }) => {
       }
       return newSet;
     });
+  };
+
+  const VideoThumbnail = ({ type, isLive }: { type: string; isLive: boolean }) => {
+    const getThumbnailContent = () => {
+      switch (type) {
+        case 'tech':
+          return (
+            <div className="w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 relative overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-blue-400/20 rounded-3xl blur-2xl"></div>
+                  <Icon name="Laptop" size={80} className="text-white relative z-10" />
+                </div>
+              </div>
+              <div className="absolute top-4 right-4 text-6xl">💻</div>
+              <div className="absolute bottom-4 left-4 text-white font-bold text-xl bg-black/30 px-3 py-1 rounded">WINDOWS 12</div>
+            </div>
+          );
+        case 'gaming':
+          return (
+            <div className="w-full h-full bg-gradient-to-br from-red-600 via-orange-600 to-yellow-600 relative overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center gap-4">
+                <div className="text-7xl animate-bounce">🎮</div>
+                <div className="text-7xl">🕹️</div>
+              </div>
+              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/50 to-transparent"></div>
+              <div className="absolute bottom-4 left-4 text-white font-bold text-2xl">TOP 10</div>
+              <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full font-bold">2026</div>
+            </div>
+          );
+        case 'coding':
+          return (
+            <div className="w-full h-full bg-gradient-to-br from-gray-900 via-green-900 to-blue-900 relative overflow-hidden">
+              <div className="absolute inset-0 p-4 font-mono text-green-400 text-xs leading-relaxed">
+                <div className="animate-pulse">{'const App = () => {'}</div>
+                <div className="ml-4">{'return ('}</div>
+                <div className="ml-8 text-blue-400">{'<div className="app">'}</div>
+                <div className="ml-12 text-yellow-400">{'<Header />'}</div>
+                <div className="ml-12">{'<Main />'}</div>
+                <div className="ml-8 text-blue-400">{'</div>'}</div>
+                <div className="ml-4">{');'}</div>
+                <div>{'};'}</div>
+              </div>
+              {isLive && (
+                <div className="absolute inset-0 bg-red-600/20 animate-pulse"></div>
+              )}
+              <div className="absolute bottom-4 right-4">
+                <Icon name="Code2" size={60} className="text-white/40" />
+              </div>
+            </div>
+          );
+        case 'music':
+          return (
+            <div className="w-full h-full bg-gradient-to-br from-purple-900 via-pink-700 to-red-600 relative overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-2 mx-1 bg-white rounded-full animate-pulse"
+                    style={{
+                      height: `${30 + Math.random() * 60}%`,
+                      animationDelay: `${i * 0.1}s`,
+                      animationDuration: '0.8s'
+                    }}
+                  ></div>
+                ))}
+              </div>
+              <div className="absolute top-4 left-4 text-6xl">🎧</div>
+              <div className="absolute bottom-4 right-4 text-white font-bold text-lg bg-black/40 px-3 py-1 rounded">3 HOURS</div>
+            </div>
+          );
+        case 'web':
+          return (
+            <div className="w-full h-full bg-gradient-to-br from-cyan-600 via-blue-600 to-purple-700 relative overflow-hidden">
+              <div className="absolute inset-0 p-6">
+                <div className="w-full h-full border-4 border-white/30 rounded-lg p-4">
+                  <div className="flex gap-1 mb-3">
+                    <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-2 bg-white/40 rounded w-3/4"></div>
+                    <div className="h-2 bg-white/40 rounded w-1/2"></div>
+                    <div className="h-2 bg-white/40 rounded w-2/3"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="absolute bottom-4 left-4 text-white font-bold text-xl bg-blue-600 px-3 py-1 rounded">HTML + CSS</div>
+            </div>
+          );
+        case 'minecraft':
+          return (
+            <div className="w-full h-full bg-gradient-to-br from-green-700 via-emerald-600 to-teal-700 relative overflow-hidden">
+              <div className="absolute inset-0" style={{
+                backgroundImage: 'linear-gradient(45deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1)), linear-gradient(45deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1))',
+                backgroundSize: '20px 20px',
+                backgroundPosition: '0 0, 10px 10px'
+              }}></div>
+              <div className="absolute inset-0 flex items-center justify-center gap-2">
+                <div className="text-6xl">⛏️</div>
+                <div className="text-6xl">🏰</div>
+              </div>
+              <div className="absolute top-4 left-4 bg-green-800 text-white px-3 py-1 rounded font-bold">MINECRAFT</div>
+            </div>
+          );
+        case 'cooking':
+          return (
+            <div className="w-full h-full bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 relative overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-8xl">🍝</div>
+              </div>
+              <div className="absolute top-4 right-4 text-5xl">👨‍🍳</div>
+              <div className="absolute bottom-4 left-4 bg-white text-red-600 px-3 py-2 rounded-lg font-bold text-lg">КАРБОНАРА</div>
+            </div>
+          );
+        case 'fitness':
+          return (
+            <div className="w-full h-full bg-gradient-to-br from-yellow-500 via-orange-500 to-red-600 relative overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center gap-4">
+                <div className="text-7xl animate-bounce" style={{ animationDuration: '1s' }}>💪</div>
+                <div className="text-7xl">🏋️</div>
+              </div>
+              {isLive && (
+                <div className="absolute inset-0 bg-red-600/30 animate-pulse"></div>
+              )}
+              <div className="absolute bottom-4 left-4 text-white font-bold text-xl bg-black/40 px-3 py-1 rounded">HOME WORKOUT</div>
+            </div>
+          );
+        case 'art':
+          return (
+            <div className="w-full h-full bg-gradient-to-br from-purple-600 via-pink-500 to-rose-500 relative overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-yellow-400/30 blur-3xl"></div>
+                  <div className="text-8xl relative z-10">🎨</div>
+                </div>
+              </div>
+              <div className="absolute top-4 left-4 text-5xl">🖌️</div>
+              <div className="absolute bottom-4 right-4 bg-purple-800 text-white px-3 py-1 rounded font-bold">ПОРТРЕТ МАСЛОМ</div>
+            </div>
+          );
+        case 'ai':
+          return (
+            <div className="w-full h-full bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 relative overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-cyan-400/40 rounded-full blur-3xl animate-pulse"></div>
+                  <Icon name="Brain" size={80} className="text-white relative z-10" />
+                </div>
+              </div>
+              <div className="absolute top-4 left-4 text-5xl">🤖</div>
+              <div className="absolute bottom-4 left-4 bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-4 py-2 rounded-lg font-bold text-xl">ChatGPT 5.0</div>
+            </div>
+          );
+        default:
+          return (
+            <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+              <Icon name="Play" size={60} className="text-white/60" />
+            </div>
+          );
+      }
+    };
+
+    return (
+      <div className="relative w-full h-full group">
+        {getThumbnailContent()}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center">
+              <Icon name="Play" size={32} className="text-white ml-1" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -780,7 +956,7 @@ const YouTubeApp = ({ onClose }: { onClose: () => void }) => {
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-red-900 via-purple-900 to-blue-900 flex items-center justify-center cursor-pointer"
+                    <div className="w-full h-full relative cursor-pointer"
                          onClick={() => {
                            setIsPlaying(true);
                            const interval = setInterval(() => {
@@ -795,16 +971,14 @@ const YouTubeApp = ({ onClose }: { onClose: () => void }) => {
                            }, 1000);
                          }}
                     >
-                      <div className="text-center space-y-4">
-                        <Button size="lg" className="w-20 h-20 rounded-full bg-red-600 hover:bg-red-700">
-                          <Icon name="Play" size={40} />
-                        </Button>
-                        {selectedVideo.isLive && (
-                          <Badge className="bg-red-600 text-white px-3 py-1">
+                      <VideoThumbnail type={selectedVideo.thumbnailType} isLive={selectedVideo.isLive} />
+                      {selectedVideo.isLive && (
+                        <div className="absolute top-4 left-4">
+                          <Badge className="bg-red-600 text-white px-3 py-1.5 font-bold text-sm">
                             🔴 В ЭФИРЕ
                           </Badge>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -888,13 +1062,13 @@ const YouTubeApp = ({ onClose }: { onClose: () => void }) => {
                       className="glass border-white/10 p-0 hover:scale-105 transition-all cursor-pointer overflow-hidden"
                       onClick={() => setSelectedVideo(video)}
                     >
-                      <div className="aspect-video bg-gradient-to-br from-red-600 to-purple-600 flex items-center justify-center relative">
-                        <Icon name="Play" size={48} className="text-white opacity-80" />
-                        <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-0.5 rounded text-white text-xs font-semibold">
+                      <div className="aspect-video relative">
+                        <VideoThumbnail type={video.thumbnailType} isLive={video.isLive} />
+                        <div className="absolute bottom-2 right-2 bg-black/90 px-2 py-0.5 rounded text-white text-xs font-bold">
                           {video.duration}
                         </div>
                         {video.isLive && (
-                          <div className="absolute top-2 left-2 bg-red-600 px-2 py-0.5 rounded text-white text-xs font-semibold">
+                          <div className="absolute top-2 left-2 bg-red-600 px-2 py-0.5 rounded text-white text-xs font-semibold animate-pulse">
                             🔴 LIVE
                           </div>
                         )}
