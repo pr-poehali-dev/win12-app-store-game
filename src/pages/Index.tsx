@@ -33,12 +33,15 @@ const apps: App[] = [
   { id: '4', name: 'MusicWave', icon: 'Music', category: 'entertainment', description: 'Музыкальный плеер с эквалайзером', size: '95 МБ', rating: 4.6 },
   { id: '5', name: 'VideoEdit Pro', icon: 'Video', category: 'creative', description: 'Монтаж видео профессионального уровня', size: '512 МБ', rating: 4.9 },
   { id: '6', name: 'NotePad++', icon: 'FileText', category: 'productivity', description: 'Заметки и документы', size: '42 МБ', rating: 4.5 },
+  { id: '7', name: 'YouTube', icon: 'Youtube', category: 'entertainment', description: 'Смотрите видео со всего мира', size: '180 МБ', rating: 5.0 },
 ];
 
 const games: Game[] = [
   { id: '1', name: 'Сапёр', icon: 'Bomb', description: 'Классическая логическая игра' },
-  { id: '2', name: 'Шахматы', icon: 'Crown', description: 'Игра для двух игроков' },
-  { id: '3', name: 'Пасьянс', icon: 'Spade', description: 'Классический карточный пасьянс' },
+  { id: '2', name: 'Minecraft', icon: 'Box', description: 'Исследуй и строй мир из кубиков' },
+  { id: '3', name: 'Roblox', icon: 'Users', description: 'Платформа для создания игр' },
+  { id: '4', name: 'Шахматы', icon: 'Crown', description: 'Игра для двух игроков' },
+  { id: '5', name: 'Пасьянс', icon: 'Spade', description: 'Классический карточный пасьянс' },
 ];
 
 const Index = () => {
@@ -48,6 +51,8 @@ const Index = () => {
   const [browserUrl, setBrowserUrl] = useState('https://poehali.dev');
   const [currentUrl, setCurrentUrl] = useState('https://poehali.dev');
   const [minesweeperActive, setMinesweeperActive] = useState(false);
+  const [activeGame, setActiveGame] = useState<string | null>(null);
+  const [youtubeActive, setYoutubeActive] = useState(false);
 
   const filteredApps = apps.filter(app => {
     const matchesSearch = app.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -206,9 +211,17 @@ const Index = () => {
                           </div>
                         </div>
                       </div>
-                      <Button className="w-full mt-4 gradient-primary">
+                      <Button 
+                        className="w-full mt-4 gradient-primary"
+                        onClick={() => {
+                          if (app.id === '7') {
+                            setYoutubeActive(true);
+                            setActiveSection('browser');
+                          }
+                        }}
+                      >
                         <Icon name="Download" size={16} className="mr-2" />
-                        Установить
+                        {app.id === '7' ? 'Открыть' : 'Установить'}
                       </Button>
                     </Card>
                   ))}
@@ -248,19 +261,23 @@ const Index = () => {
                   </div>
                 </div>
 
-                <Card className="flex-1 glass border-white/10 p-8 overflow-hidden">
-                  <div className="h-full flex items-center justify-center">
-                    <div className="text-center space-y-4">
-                      <div className="gradient-accent p-6 rounded-3xl inline-block">
-                        <Icon name="Globe" size={64} className="text-white" />
+                {youtubeActive ? (
+                  <YouTubeApp onClose={() => setYoutubeActive(false)} />
+                ) : (
+                  <Card className="flex-1 glass border-white/10 p-8 overflow-hidden">
+                    <div className="h-full flex items-center justify-center">
+                      <div className="text-center space-y-4">
+                        <div className="gradient-accent p-6 rounded-3xl inline-block">
+                          <Icon name="Globe" size={64} className="text-white" />
+                        </div>
+                        <h3 className="text-2xl font-semibold text-white">Введите адрес сайта</h3>
+                        <p className="text-white/70 max-w-md">
+                          Текущий адрес: <span className="text-accent font-mono">{currentUrl}</span>
+                        </p>
                       </div>
-                      <h3 className="text-2xl font-semibold text-white">Введите адрес сайта</h3>
-                      <p className="text-white/70 max-w-md">
-                        Текущий адрес: <span className="text-accent font-mono">{currentUrl}</span>
-                      </p>
                     </div>
-                  </div>
-                </Card>
+                  </Card>
+                )}
               </div>
             )}
 
@@ -268,13 +285,13 @@ const Index = () => {
               <div className="space-y-6 animate-fade-in">
                 <h2 className="text-3xl font-bold text-white">Игры</h2>
 
-                {!minesweeperActive ? (
+{!activeGame ? (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {games.map((game) => (
                       <Card 
                         key={game.id} 
                         className="glass border-white/10 p-6 hover:scale-105 transition-all cursor-pointer hover:border-primary/50"
-                        onClick={() => game.id === '1' && setMinesweeperActive(true)}
+                        onClick={() => setActiveGame(game.id)}
                       >
                         <div className="bg-gradient-to-br from-pink-500 to-orange-500 w-20 h-20 rounded-2xl flex items-center justify-center mb-4 mx-auto">
                           <Icon name={game.icon} className="text-white" size={40} />
@@ -293,12 +310,14 @@ const Index = () => {
                     <Button 
                       variant="outline" 
                       className="glass border-white/20 text-white hover:bg-white/10"
-                      onClick={() => setMinesweeperActive(false)}
+                      onClick={() => setActiveGame(null)}
                     >
                       <Icon name="ArrowLeft" size={16} className="mr-2" />
                       Назад к играм
                     </Button>
-                    <Minesweeper />
+                    {activeGame === '1' && <Minesweeper />}
+                    {activeGame === '2' && <MinecraftGame />}
+                    {activeGame === '3' && <RobloxGame />}
                   </div>
                 )}
               </div>
@@ -570,6 +589,326 @@ const Minesweeper = () => {
           <p>• Левый клик - открыть ячейку</p>
           <p>• Правый клик - установить флаг</p>
           <p>• Найдите все мины без подрыва!</p>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+const YouTubeApp = ({ onClose }: { onClose: () => void }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+
+  const videos = [
+    { id: '1', title: 'Обзор Windows 12', channel: 'Tech Channel', views: '1.2M', thumbnail: '🎬' },
+    { id: '2', title: 'Топ игр 2026 года', channel: 'Gaming Pro', views: '850K', thumbnail: '🎮' },
+    { id: '3', title: 'Уроки программирования', channel: 'Code Academy', views: '2.1M', thumbnail: '💻' },
+    { id: '4', title: 'Музыка для работы', channel: 'Chill Beats', views: '5.3M', thumbnail: '🎵' },
+    { id: '5', title: 'Как создать сайт', channel: 'Web Dev', views: '620K', thumbnail: '🌐' },
+    { id: '6', title: 'Minecraft строительство', channel: 'Craft Master', views: '3.8M', thumbnail: '⛏️' },
+  ];
+
+  const filteredVideos = videos.filter(v => 
+    v.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    v.channel.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <Card className="flex-1 glass border-white/10 overflow-hidden flex flex-col">
+      <div className="bg-red-600 px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Icon name="Youtube" className="text-white" size={32} />
+          <h2 className="text-2xl font-bold text-white">YouTube</h2>
+        </div>
+        <Button variant="ghost" onClick={onClose} className="text-white hover:bg-white/10">
+          <Icon name="X" size={20} />
+        </Button>
+      </div>
+
+      <div className="p-6">
+        <div className="relative mb-6">
+          <Icon name="Search" className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" size={20} />
+          <Input
+            placeholder="Поиск видео..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-12 glass border-white/20 text-white placeholder:text-white/50 h-12"
+          />
+        </div>
+
+        {selectedVideo ? (
+          <div className="space-y-4">
+            <Button 
+              variant="outline" 
+              className="glass border-white/20 text-white hover:bg-white/10"
+              onClick={() => setSelectedVideo(null)}
+            >
+              <Icon name="ArrowLeft" size={16} className="mr-2" />
+              Назад к видео
+            </Button>
+            <Card className="glass border-white/10 p-8">
+              <div className="aspect-video bg-gradient-to-br from-red-600 to-pink-600 rounded-xl flex items-center justify-center mb-4">
+                <div className="text-center space-y-4">
+                  <div className="text-8xl">{videos.find(v => v.id === selectedVideo)?.thumbnail}</div>
+                  <Button size="lg" className="bg-white text-red-600 hover:bg-white/90">
+                    <Icon name="Play" size={32} className="mr-2" />
+                    Воспроизвести
+                  </Button>
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">
+                {videos.find(v => v.id === selectedVideo)?.title}
+              </h3>
+              <p className="text-white/70">
+                {videos.find(v => v.id === selectedVideo)?.channel} • {videos.find(v => v.id === selectedVideo)?.views} просмотров
+              </p>
+            </Card>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredVideos.map((video) => (
+              <Card 
+                key={video.id} 
+                className="glass border-white/10 p-4 hover:scale-105 transition-all cursor-pointer hover:border-red-500/50"
+                onClick={() => setSelectedVideo(video.id)}
+              >
+                <div className="aspect-video bg-gradient-to-br from-red-600 to-pink-600 rounded-xl flex items-center justify-center mb-3 text-6xl">
+                  {video.thumbnail}
+                </div>
+                <h4 className="text-white font-semibold mb-1 line-clamp-2">{video.title}</h4>
+                <p className="text-sm text-white/70">{video.channel}</p>
+                <p className="text-xs text-white/50">{video.views} просмотров</p>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+};
+
+const MinecraftGame = () => {
+  const [playerPos, setPlayerPos] = useState({ x: 5, y: 5 });
+  const [inventory, setInventory] = useState({ wood: 0, stone: 0, dirt: 0 });
+  const gridSize = 10;
+
+  const grid = Array(gridSize).fill(null).map((_, y) =>
+    Array(gridSize).fill(null).map((_, x) => {
+      const random = Math.random();
+      if (random > 0.7) return 'tree';
+      if (random > 0.5) return 'stone';
+      if (random > 0.3) return 'dirt';
+      return 'grass';
+    })
+  );
+
+  const movePlayer = (dx: number, dy: number) => {
+    setPlayerPos(prev => ({
+      x: Math.max(0, Math.min(gridSize - 1, prev.x + dx)),
+      y: Math.max(0, Math.min(gridSize - 1, prev.y + dy))
+    }));
+  };
+
+  const collectResource = () => {
+    const cell = grid[playerPos.y][playerPos.x];
+    if (cell === 'tree') {
+      setInventory(prev => ({ ...prev, wood: prev.wood + 1 }));
+    } else if (cell === 'stone') {
+      setInventory(prev => ({ ...prev, stone: prev.stone + 1 }));
+    } else if (cell === 'dirt') {
+      setInventory(prev => ({ ...prev, dirt: prev.dirt + 1 }));
+    }
+  };
+
+  const getCellEmoji = (type: string, isPlayer: boolean) => {
+    if (isPlayer) return '🧍';
+    if (type === 'tree') return '🌲';
+    if (type === 'stone') return '🪨';
+    if (type === 'dirt') return '🟫';
+    return '🟩';
+  };
+
+  return (
+    <Card className="glass border-white/10 p-8">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-2xl font-bold text-white">Minecraft</h3>
+          <div className="flex gap-4">
+            <Badge className="bg-green-600 text-white">🪵 Дерево: {inventory.wood}</Badge>
+            <Badge className="bg-gray-600 text-white">🪨 Камень: {inventory.stone}</Badge>
+            <Badge className="bg-amber-800 text-white">🟫 Земля: {inventory.dirt}</Badge>
+          </div>
+        </div>
+
+        <div className="inline-block">
+          <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }}>
+            {grid.map((row, y) =>
+              row.map((cell, x) => (
+                <div
+                  key={`${x}-${y}`}
+                  className="w-14 h-14 rounded-lg flex items-center justify-center text-3xl bg-white/5 border border-white/10"
+                >
+                  {getCellEmoji(cell, playerPos.x === x && playerPos.y === y)}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="flex gap-4">
+          <div className="space-y-2">
+            <p className="text-white font-semibold mb-2">Управление:</p>
+            <div className="grid grid-cols-3 gap-2 w-40">
+              <div></div>
+              <Button onClick={() => movePlayer(0, -1)} className="gradient-primary">
+                <Icon name="ChevronUp" size={20} />
+              </Button>
+              <div></div>
+              <Button onClick={() => movePlayer(-1, 0)} className="gradient-primary">
+                <Icon name="ChevronLeft" size={20} />
+              </Button>
+              <Button onClick={collectResource} className="bg-green-600 hover:bg-green-700">
+                <Icon name="Pickaxe" size={20} />
+              </Button>
+              <Button onClick={() => movePlayer(1, 0)} className="gradient-primary">
+                <Icon name="ChevronRight" size={20} />
+              </Button>
+              <div></div>
+              <Button onClick={() => movePlayer(0, 1)} className="gradient-primary">
+                <Icon name="ChevronDown" size={20} />
+              </Button>
+              <div></div>
+            </div>
+          </div>
+
+          <div className="flex-1 glass border-white/10 p-4 rounded-xl">
+            <p className="text-white/70 text-sm space-y-2">
+              <p>• Используйте стрелки для перемещения</p>
+              <p>• Нажмите среднюю кнопку для сбора ресурсов</p>
+              <p>• 🌲 Дерево • 🪨 Камень • 🟫 Земля • 🟩 Трава</p>
+              <p>• Собирайте ресурсы и стройте свой мир!</p>
+            </p>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+const RobloxGame = () => {
+  const [playerPos, setPlayerPos] = useState({ x: 3, y: 7 });
+  const [coins, setCoins] = useState(0);
+  const [collectedCoins, setCollectedCoins] = useState<Set<string>>(new Set());
+  const gridSize = 10;
+
+  const coinPositions = [
+    { x: 2, y: 2 }, { x: 5, y: 3 }, { x: 8, y: 2 },
+    { x: 1, y: 5 }, { x: 7, y: 6 }, { x: 4, y: 8 },
+  ];
+
+  const obstacles = [
+    { x: 3, y: 3 }, { x: 4, y: 3 }, { x: 5, y: 4 },
+    { x: 6, y: 5 }, { x: 2, y: 7 },
+  ];
+
+  const movePlayer = (dx: number, dy: number) => {
+    const newX = Math.max(0, Math.min(gridSize - 1, playerPos.x + dx));
+    const newY = Math.max(0, Math.min(gridSize - 1, playerPos.y + dy));
+    
+    const hasObstacle = obstacles.some(obs => obs.x === newX && obs.y === newY);
+    if (hasObstacle) return;
+
+    setPlayerPos({ x: newX, y: newY });
+
+    const coinKey = `${newX}-${newY}`;
+    const hasCoin = coinPositions.some(coin => coin.x === newX && coin.y === newY);
+    if (hasCoin && !collectedCoins.has(coinKey)) {
+      setCoins(prev => prev + 1);
+      setCollectedCoins(prev => new Set([...prev, coinKey]));
+    }
+  };
+
+  const getCellContent = (x: number, y: number) => {
+    if (playerPos.x === x && playerPos.y === y) return '🎮';
+    if (obstacles.some(obs => obs.x === x && obs.y === y)) return '🧱';
+    
+    const coinKey = `${x}-${y}`;
+    if (coinPositions.some(coin => coin.x === x && coin.y === y) && !collectedCoins.has(coinKey)) {
+      return '🪙';
+    }
+    
+    return '';
+  };
+
+  return (
+    <Card className="glass border-white/10 p-8">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-2xl font-bold text-white">Roblox - Собери монеты</h3>
+          <Badge className="bg-yellow-600 text-white text-lg px-4 py-2">
+            🪙 Монеты: {coins} / {coinPositions.length}
+          </Badge>
+        </div>
+
+        {coins === coinPositions.length && (
+          <div className="bg-green-500/20 border border-green-500/50 rounded-xl p-4 text-center">
+            <p className="text-xl font-semibold text-green-400">🎉 Поздравляем! Вы собрали все монеты!</p>
+          </div>
+        )}
+
+        <div className="inline-block">
+          <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }}>
+            {Array(gridSize).fill(null).map((_, y) =>
+              Array(gridSize).fill(null).map((_, x) => (
+                <div
+                  key={`${x}-${y}`}
+                  className={`w-14 h-14 rounded-lg flex items-center justify-center text-3xl border transition-all ${
+                    obstacles.some(obs => obs.x === x && obs.y === y)
+                      ? 'bg-gray-700 border-gray-600'
+                      : 'bg-blue-900/30 border-blue-500/20'
+                  }`}
+                >
+                  {getCellContent(x, y)}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="flex gap-4">
+          <div className="space-y-2">
+            <p className="text-white font-semibold mb-2">Управление:</p>
+            <div className="grid grid-cols-3 gap-2 w-40">
+              <div></div>
+              <Button onClick={() => movePlayer(0, -1)} className="gradient-primary">
+                <Icon name="ChevronUp" size={20} />
+              </Button>
+              <div></div>
+              <Button onClick={() => movePlayer(-1, 0)} className="gradient-primary">
+                <Icon name="ChevronLeft" size={20} />
+              </Button>
+              <div className="flex items-center justify-center">
+                <span className="text-2xl">🎮</span>
+              </div>
+              <Button onClick={() => movePlayer(1, 0)} className="gradient-primary">
+                <Icon name="ChevronRight" size={20} />
+              </Button>
+              <div></div>
+              <Button onClick={() => movePlayer(0, 1)} className="gradient-primary">
+                <Icon name="ChevronDown" size={20} />
+              </Button>
+              <div></div>
+            </div>
+          </div>
+
+          <div className="flex-1 glass border-white/10 p-4 rounded-xl">
+            <p className="text-white/70 text-sm space-y-2">
+              <p>• Управляйте персонажем стрелками</p>
+              <p>• Собирайте монеты 🪙 на карте</p>
+              <p>• Избегайте препятствия 🧱</p>
+              <p>• Соберите все монеты чтобы выиграть!</p>
+            </p>
+          </div>
         </div>
       </div>
     </Card>
